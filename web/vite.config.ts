@@ -5,7 +5,7 @@ import viteAssets from './util/vite-asset-plugin';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), viteCompression(), viteAssets()],
+  plugins: [react(), viteCompression({filter: () => true}), viteAssets()],
   resolve: {
     alias: [
       {

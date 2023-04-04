@@ -136,7 +136,7 @@ void EpaperWebServer::begin() {
 
   server.onNotFound([this](AsyncWebServerRequest* request) {
     if (request->url() == "/" || request->url().startsWith("/app")) {
-      _handleServeGzip_P(TEXT_HTML,
+      _handleServe_P(TEXT_HTML,
           INDEX_HTML,
           INDEX_HTML_LENGTH,
           request);
@@ -424,6 +424,21 @@ void EpaperWebServer::_handleServeGzip_P(const char* contentType,
   AsyncWebServerResponse* response =
       request->beginResponse_P(200, contentType, text, length);
   response->addHeader("Content-Encoding", "gzip");
+  request->send(response);
+}
+void EpaperWebServer::handleServe_P(const char* contentType,
+    const uint8_t* text,
+    size_t length,
+    RequestContext& request) {
+  _handleServe_P(contentType, text, length, request.rawRequest);
+}
+
+void EpaperWebServer::_handleServe_P(const char* contentType,
+    const uint8_t* text,
+    size_t length,
+    AsyncWebServerRequest* request) {
+  AsyncWebServerResponse* response =
+      request->beginResponse_P(200, contentType, text, length);
   request->send(response);
 }
 
