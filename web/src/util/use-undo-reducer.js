@@ -10,13 +10,13 @@ export const CLEAR_HISTORY = "clear_history";
 export const MARK_SAVED = "mark_saved";
 
 const CollapseState = Object.freeze({
-  not_collapsing: 0 ,
+  not_collapsing: 0,
   start_collapse: 1,
-  collapsing: 2
+  collapsing: 2,
 });
 
-function mapReducer(reducer = x => x) {
-  return function(state, action) {
+function mapReducer(reducer = (x) => x) {
+  return function (state, action) {
     const { map } = state;
 
     switch (action.type) {
@@ -26,7 +26,7 @@ function mapReducer(reducer = x => x) {
         if (map[key] != value) {
           return {
             ...state,
-            map: { ...map, [key]: value }
+            map: { ...map, [key]: value },
           };
         } else {
           return state;
@@ -41,8 +41,8 @@ function mapReducer(reducer = x => x) {
   };
 }
 
-function listReducer(reducer = x => x) {
-  return function(state, action) {
+function listReducer(reducer = (x) => x) {
+  return function (state, action) {
     const { list } = state;
 
     switch (action.type) {
@@ -69,7 +69,7 @@ function listReducer(reducer = x => x) {
 
 export function useUndoableList() {
   const { state, dispatch, ...rest } = useUndoableReducer(listReducer(), {
-    list: []
+    list: [],
   });
 
   const list = state.list;
@@ -83,7 +83,7 @@ export function useUndoableList() {
 
 export function useUndoableMap() {
   const { state, dispatch, ...rest } = useUndoableReducer(mapReducer(), {
-    map: {}
+    map: {},
   });
 
   const map = state.map;
@@ -99,7 +99,7 @@ export function useUndoableReducer(reducer, initialPresent) {
     history: [initialPresent],
     currentIndex: 0,
     collapseState: CollapseState.not_collapsing,
-    saved: true
+    saved: true,
   };
 
   const [state, dispatch] = useReducer(undoable(reducer), initialState);
@@ -136,13 +136,13 @@ export function useUndoableReducer(reducer, initialPresent) {
     markForCollapse,
     collapse,
     clearHistory,
-    markSaved
+    markSaved,
   };
 }
 
 function undoable(reducer) {
   // Return a reducer that handles undo and redo
-  return function(state, action) {
+  return function (state, action) {
     const { history, currentIndex, collapseState } = state;
 
     switch (action.type) {
@@ -155,7 +155,7 @@ function undoable(reducer) {
       case COLLAPSE:
         return {
           ...state,
-          collapseState: CollapseState.not_collapsing
+          collapseState: CollapseState.not_collapsing,
         };
       case UNDO:
         if (currentIndex == 0) {
@@ -165,28 +165,28 @@ function undoable(reducer) {
         return {
           ...state,
           saved: false,
-          currentIndex: currentIndex - 1
+          currentIndex: currentIndex - 1,
         };
       case REDO:
-        if (currentIndex+1 >= history.length) {
+        if (currentIndex + 1 >= history.length) {
           return state;
         }
 
         return {
           ...state,
           saved: false,
-          currentIndex: currentIndex + 1
+          currentIndex: currentIndex + 1,
         };
       case CLEAR_HISTORY:
         return {
           ...state,
           history: [history[currentIndex]],
-          currentIndex: 0
+          currentIndex: 0,
         };
       case MARK_SAVED:
         return {
           ...state,
-          saved: true
+          saved: true,
         };
       default:
         // Delegate handling the action to the passed reducer
@@ -200,7 +200,7 @@ function undoable(reducer) {
         }
 
         if (skipHistory || collapseState !== CollapseState.not_collapsing) {
-          const newHistory = history.slice(0, currentIndex+1);
+          const newHistory = history.slice(0, currentIndex + 1);
 
           if (skipHistory || collapseState === CollapseState.collapsing) {
             newHistory[currentIndex] = newPresent;
@@ -211,8 +211,8 @@ function undoable(reducer) {
           return {
             ...state,
             history: newHistory,
-            currentIndex: newHistory.length-1,
-            collapseState: CollapseState.collapsing
+            currentIndex: newHistory.length - 1,
+            collapseState: CollapseState.collapsing,
           };
         } else {
           const newIndex = currentIndex + 1;
@@ -222,7 +222,7 @@ function undoable(reducer) {
             ...state,
             saved: false,
             history: [...newHistory, newPresent],
-            currentIndex: newIndex
+            currentIndex: newIndex,
           };
         }
     }

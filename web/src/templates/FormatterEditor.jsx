@@ -1,13 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faPlus,
-  faPencilAlt,
-  faTrash,
-  faSave
-} from "@fortawesome/free-solid-svg-icons";
-import { useBoolean } from "react-use";
+import { faPlus, faTrash, faSave } from "@fortawesome/free-solid-svg-icons";
 import Form from "react-jsonschema-form";
 import { FormatterSchema, MarkedForDeletion } from "./schema";
 import { BadgedText } from "./BadgedText";
@@ -19,21 +13,21 @@ import Alert from "react-bootstrap/Alert";
 const uiSchema = {
   formatter: {
     type: {
-      "ui:enumDisabled": ["ref"]
-    }
+      "ui:enumDisabled": ["ref"],
+    },
   },
-  "ui:ArrayFieldTemplate": ArrayFieldTemplate
+  "ui:ArrayFieldTemplate": ArrayFieldTemplate,
 };
 
 function FormatterForm({ initialState = {}, onSave, onCancel }) {
   const [formState, setFormState] = useState(initialState);
 
-  const onChange = useCallback(e => {
+  const onChange = useCallback((e) => {
     setFormState(e.formData);
   }, []);
 
   const onSubmit = useCallback(
-    e => {
+    (e) => {
       onSave(formState);
     },
     [onSave, formState]
@@ -70,7 +64,7 @@ function FormatterForm({ initialState = {}, onSave, onCancel }) {
 
 function FormatterListItem({ formatter, index, onEdit, onDelete }) {
   const _onEdit = useCallback(
-    e => {
+    (e) => {
       e.preventDefault();
       onEdit(index);
     },
@@ -78,7 +72,7 @@ function FormatterListItem({ formatter, index, onEdit, onDelete }) {
   );
 
   const _onDelete = useCallback(
-    e => {
+    (e) => {
       e.preventDefault();
 
       if (confirm("Are you sure you want to delete this formatter?")) {
@@ -148,7 +142,7 @@ export function FormatterEditor({ value, onUpdate }) {
   const onNew = useCallback(() => {
     if (!value.formatters) {
       onUpdate(
-        produce(value, draft => {
+        produce(value, (draft) => {
           draft.formatters = [];
         })
       );
@@ -157,15 +151,15 @@ export function FormatterEditor({ value, onUpdate }) {
   }, [value]);
 
   const onEdit = useCallback(
-    index => {
+    (index) => {
       setEditing(index);
     },
     [value]
   );
 
   const onSave = useCallback(
-    data => {
-      const updated = produce(value, draft => {
+    (data) => {
+      const updated = produce(value, (draft) => {
         if (editing === "new") {
           draft.formatters.push(data);
         } else {
@@ -178,8 +172,8 @@ export function FormatterEditor({ value, onUpdate }) {
     [value, onUpdate, editing]
   );
 
-  const onDelete = useCallback(index => {
-    const updated = produce(value, draft => {
+  const onDelete = useCallback((index) => {
+    const updated = produce(value, (draft) => {
       draft.formatters.splice(index, 1, MarkedForDeletion);
     });
     onUpdate(updated);

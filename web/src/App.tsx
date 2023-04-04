@@ -1,7 +1,6 @@
-import { hot } from "react-hot-loader";
 import React, { useEffect } from "react";
 import Container from "react-bootstrap/Container";
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 
 import "./App.scss";
 import NavBar from "./NavBar";
@@ -23,12 +22,12 @@ const App = () => {
 
   return (
     <div className="container">
-      <Router basename="/app">
+      <BrowserRouter>
         <NavBar />
 
         <Container className="main-content">
           <ErrorBoundary>
-            {globalState.errors.map((msg, i) => {
+            {globalState.errors.map((msg: string, i: number) => {
               return (
                 <Alert
                   variant="danger"
@@ -39,28 +38,18 @@ const App = () => {
                 </Alert>
               );
             })}
-            <Switch>
-              <Route path="/templates">
-                <TemplatesIndex />
-              </Route>
-              <Route path="/settings">
-                <SettingsForm />
-              </Route>
-              <Route path="/variables">
-                <VariablesIndex />
-              </Route>
-              <Route path="/bitmaps">
-                <BitmapsIndex />
-              </Route>
-              <Route exact path="/">
-                <Dashboard />
-              </Route>
-            </Switch>
+            <Routes>
+              <Route path="templates/*" element={<TemplatesIndex />} />
+              <Route path="settings/*" element={<SettingsForm />} />
+              <Route path="variables/*" element={<VariablesIndex />} />
+              <Route path="bitmaps/*" element={<BitmapsIndex />} />
+              <Route path="/" element={<Dashboard />} />
+            </Routes>
           </ErrorBoundary>
         </Container>
-      </Router>
+      </BrowserRouter>
     </div>
   );
 };
 
-export default hot(module)(App);
+export default App;

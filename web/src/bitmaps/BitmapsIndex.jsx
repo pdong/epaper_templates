@@ -5,16 +5,18 @@ import React, {
   useEffect,
   useRef,
   useState,
-  useMemo
+  useMemo,
 } from "react";
 import {
   Link,
   Route,
-  Switch,
-  useHistory,
-  useRouteMatch
+  Routes,
+  useNavigate,
+  useParams,
+  useLocation,
+  matchRoutes,
 } from "react-router-dom";
-import { useLocation, useMap, useLocalStorage } from "react-use";
+import { useMap, useLocalStorage } from "react-use";
 import api from "../util/api";
 import SiteLoader from "../util/SiteLoader";
 import BitmapCanvas from "./BitmapCanvas";
@@ -70,7 +72,7 @@ const BitmapList = ({ bitmapData, bitmapList }) => {
             New Bitmap
           </Link>
           <ul className="bitmap-list">
-            {_sortedList.map(x => (
+            {_sortedList.map((x) => (
               <BitmapPreview
                 key={x.name}
                 definition={x}
@@ -85,10 +87,10 @@ const BitmapList = ({ bitmapData, bitmapList }) => {
 };
 
 const ShowBitmapEditor = ({ reload, doneLoading, bitmapData, bitmapList }) => {
-  const match = useRouteMatch();
-  const history = useHistory();
+  const navigate = useNavigate();
   const location = useLocation();
-  const filename = match.params.filename;
+  const [{ route }] = matchRoutes([{ path: "/bitmaps/:filename" }], location);
+  const { filename } = useParams();
   const isNew = filename === "_new";
 
   const [bitmapDefinition, setBitmapDefinition] = useState(null);
@@ -96,7 +98,8 @@ const ShowBitmapEditor = ({ reload, doneLoading, bitmapData, bitmapList }) => {
   const [initializing, setInitializing] = useState(true);
 
   useEffect(() => {
-    const bt = bitmapList && bitmapList.find(x => x.filename == filename);
+    if (isNew) return;
+    const bt = bitmapList && bitmapList.find((x) => x.filename == filename);
     setBitmapDefinition(bt);
 
     if (bt) {
@@ -113,13 +116,14 @@ const ShowBitmapEditor = ({ reload, doneLoading, bitmapData, bitmapList }) => {
     if (filename) {
       const width = parseInt(params.get("w"));
       const height = parseInt(params.get("h"));
-
+      console.log("user effect", filename, width, height);
       const bitmap = {
         filename,
         metadata: { width, height },
-        name: `/b/${filename}`
+        name: `/b/${filename}`,
       };
       _setBitmapData(new Uint8Array((width * height) / 8));
+      console.log(bitmap);
       setBitmapDefinition(bitmap);
     }
   }, [location]);
@@ -143,7 +147,7 @@ const ShowBitmapEditor = ({ reload, doneLoading, bitmapData, bitmapList }) => {
       api.post("/bitmaps", formData).then(() => {
         reload([bitmapDefinition.name], () => {
           if (isNew) {
-            history.push(`/bitmaps/${bitmapDefinition.filename}`);
+            navigate(`/bitmaps/${bitmapDefinition.filename}`);
           }
         });
       });
@@ -156,19 +160,20 @@ const ShowBitmapEditor = ({ reload, doneLoading, bitmapData, bitmapList }) => {
       api.delete(`/bitmaps/${bitmapDefinition.filename}`).then(() => {
         reload();
 
-        history.push("/bitmaps");
+        navigate("/bitmaps");
       });
     }
   }, [history, bitmapDefinition, reload]);
 
   const onNewBitmap = useCallback(({ filename, width, height }) => {
-    history.push(`${match.url}?filename=${filename}&w=${width}&h=${height}`);
+    navigate(`${route.url}?filename=${filename}&w=${width}&h=${height}`);
   }, []);
 
   if (bitmapDefinition == null) {
     if (!doneLoading || initializing) {
       return <SiteLoader />;
     } else if (isNew) {
+      console.log("new", bitmapDefinition);
       return <NewBitmapConfigurator onSave={onNewBitmap} />;
     } else {
       return <h3 className="text-center pt-5">Bitmap not found</h3>;
@@ -185,7 +190,7 @@ const ShowBitmapEditor = ({ reload, doneLoading, bitmapData, bitmapList }) => {
   }
 };
 
-export default props => {
+export default (props) => {
   const [globalState, globalActions] = useGlobalState();
   const [bitmapList, setBitmapList] = useState(null);
   const [bitmaps, { set: setBitmap }] = useMap({});
@@ -195,10 +200,10 @@ export default props => {
   const reloadList = useCallback(() => {
     return new Promise((resolve, reject) => {
       api.get("/bitmaps").then(
-        e => {
+        (e) => {
           doneLoading.current = true;
 
-          const list = e.data.bitmaps.map(x => {
+          const list = e.data.bitmaps.map((x) => {
             const filename = x.name.split("/").slice(-1)[0];
             return { ...x, filename };
           });
@@ -206,7 +211,7 @@ export default props => {
           setBitmapList(list);
           resolve(list);
         },
-        e => {
+        (e) => {
           reject(e);
         }
       );
@@ -215,7 +220,7 @@ export default props => {
 
   const reloadBitmaps = useCallback(
     (bitmapList, forceReload = []) => {
-      const isCached = x => {
+      const isCached = (x) => {
         const { name, metadata: { hash = null } = {} } = x;
         return bitmapCache[name] && bitmapCache[name].hash == hash;
       };
@@ -223,21 +228,21 @@ export default props => {
       const updatedCache = {};
       const updatePromises = bitmapList
         .filter(
-          x =>
+          (x) =>
             !isCached(x) &&
-            (!bitmaps[x.name] || forceReload.find(r => r == x.name))
+            (!bitmaps[x.name] || forceReload.find((r) => r == x.name))
         )
-        .map(x => {
+        .map((x) => {
           return api
             .get(`/bitmaps/${x.filename}`, {
-              responseType: "arraybuffer"
+              responseType: "arraybuffer",
             })
-            .then(e => {
+            .then((e) => {
               const cacheData = new Uint8Array(e.data);
 
               updatedCache[x.name] = {
                 hash: simpleHash(cacheData),
-                data: fromByteArray(cacheData)
+                data: fromByteArray(cacheData),
               };
 
               setBitmap(x.name, e.data);
@@ -245,8 +250,8 @@ export default props => {
         });
 
       bitmapList
-        .filter(x => isCached(x))
-        .map(x => {
+        .filter((x) => isCached(x))
+        .map((x) => {
           setBitmap(x.name, toByteArray(bitmapCache[x.name].data));
         });
 
@@ -259,10 +264,10 @@ export default props => {
 
   const reload = useCallback(
     (forceReload = [], onComplete = () => {}) => {
-      globalActions.loadBitmaps({forceReload: true})
+      globalActions.loadBitmaps({ forceReload: true });
 
       reloadList()
-        .then(e => reloadBitmaps(e, forceReload))
+        .then((e) => reloadBitmaps(e, forceReload))
         .then(onComplete);
     },
     [reloadBitmaps]
@@ -271,18 +276,22 @@ export default props => {
   useEffect(reload, []);
 
   return (
-    <Switch>
-      <Route path="/bitmaps/:filename">
-        <ShowBitmapEditor
-          doneLoading={doneLoading.current}
-          bitmapData={bitmaps}
-          bitmapList={bitmapList}
-          reload={reload}
-        />
-      </Route>
-      <Route exact path="/bitmaps">
-        <BitmapList bitmapData={bitmaps} bitmapList={bitmapList} />
-      </Route>
-    </Switch>
+    <Routes>
+      <Route
+        path=":filename"
+        element={
+          <ShowBitmapEditor
+            doneLoading={doneLoading.current}
+            bitmapData={bitmaps}
+            bitmapList={bitmapList}
+            reload={reload}
+          />
+        }
+      />
+      <Route
+        path="/"
+        element={<BitmapList bitmapData={bitmaps} bitmapList={bitmapList} />}
+      />
+    </Routes>
   );
 };

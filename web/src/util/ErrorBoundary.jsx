@@ -1,13 +1,9 @@
 import React from "react";
-import Alert from "react-bootstrap/Alert";
-import Jumbotron from "react-bootstrap/Jumbotron";
 import MemoizedFontAwesomeIcon from "./MemoizedFontAwesomeIcon";
 import {
-  faClipboard,
   faExclamationCircle,
-  faCopy,
   faExternalLinkAlt,
-  faRecycle
+  faRecycle,
 } from "@fortawesome/free-solid-svg-icons";
 import Button from "react-bootstrap/Button";
 
@@ -41,12 +37,12 @@ export default class ErrorBoundary extends React.Component {
           message: error_object.message,
           stack: error_object.stack,
           columnNumber: error_object.columnNumber,
-          name: error_object.name
-        }
+          name: error_object.name,
+        },
       };
 
       return (
-        <Jumbotron className="py-4">
+        <div className="py-4">
           <h3 className="text-danger">
             <MemoizedFontAwesomeIcon
               icon={faExclamationCircle}
@@ -84,7 +80,10 @@ export default class ErrorBoundary extends React.Component {
               </a>
 
               <Button variant="outline-warning" onClick={this.onRefresh}>
-                <MemoizedFontAwesomeIcon icon={faRecycle} className="fa-fw mr-2" />
+                <MemoizedFontAwesomeIcon
+                  icon={faRecycle}
+                  className="fa-fw mr-2"
+                />
                 Reload Page
               </Button>
             </div>
@@ -93,14 +92,13 @@ export default class ErrorBoundary extends React.Component {
           <div>
             <textarea
               className="w-100"
-              rows="3"
+              rows="25"
               style={{ fontFamily: "monospace" }}
               readOnly
-            >
-              {JSON.stringify(errorDefn, null, 2)}
-            </textarea>
+              defaultValue={JSON.stringify(errorDefn, null, 2)}
+            />
           </div>
-        </Jumbotron>
+        </div>
       );
     } else {
       return <>{this.props.children}</>;

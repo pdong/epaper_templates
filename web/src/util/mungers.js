@@ -1,7 +1,7 @@
-const deepmerge = require('deepmerge');
+import deepmerge from "deepmerge";
 
 export function drillMerge(object, path, newValue) {
-  return drillModify(object, path, obj => ({ ...obj, ...newValue }));
+  return drillModify(object, path, (obj) => ({ ...obj, ...newValue }));
 }
 
 export function drillModify(object, path, fn) {
@@ -19,7 +19,7 @@ export function drillModify(object, path, fn) {
   } else {
     return {
       ...object,
-      [head]: drillModify(object[head] || {}, rest, fn)
+      [head]: drillModify(object[head] || {}, rest, fn),
     };
   }
 }
@@ -47,15 +47,15 @@ function _drillFilter(object, path) {
     const result = _drillFilter(object[key], rest);
 
     if (Array.isArray(object)) {
-      return [result]
+      return [result];
     } else {
-      return {[key]: result};
+      return { [key]: result };
     }
   }
 }
 
 export function drillFilter(object, paths) {
-  const filtered = paths.map(x => _drillFilter(object, x))
+  const filtered = paths.map((x) => _drillFilter(object, x));
   return deepmerge.all(filtered);
 }
 
@@ -79,7 +79,7 @@ function _deepClearNonMatching(o1, o2) {
   const keyUnion = [...new Set([...Object.keys(o1), ...Object.keys(o2)])];
 
   const commonFields = keyUnion
-    .map(k => {
+    .map((k) => {
       if (o1[k] === o2[k]) {
         return [k, o1[k]];
       } else if (typeof o1[k] === "object" && typeof o2[k] === "object") {
@@ -88,7 +88,7 @@ function _deepClearNonMatching(o1, o2) {
         return null;
       }
     })
-    .filter(x => x != null && x[1] != null);
+    .filter((x) => x != null && x[1] != null);
 
   if (commonFields.length > 0) {
     return Object.fromEntries(commonFields);
@@ -155,7 +155,7 @@ export const setGroupReducer = (a, x) => {
 export function groupBy(
   o,
   fn,
-  { valueFn = x => x, groupReducer = arrayGroupReducer } = {}
+  { valueFn = (x) => x, groupReducer = arrayGroupReducer } = {}
 ) {
   return o.reduce((a, x) => {
     const key = fn(x);

@@ -19,7 +19,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useInterval, useBoolean } from "react-use";
 import MemoizedFontAwesomeIcon from "../util/MemoizedFontAwesomeIcon";
-import { useMemo } from "react";
 import useGlobalState from "../state/global_state";
 
 const DisplayStatusCard = ({ settings }) => {
