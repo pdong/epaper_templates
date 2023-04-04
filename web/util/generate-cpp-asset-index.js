@@ -1,6 +1,4 @@
-const PLUGIN_NAME = "GenerateCpAssetIndex"
-
-const buildCppAssetDefinition = (filename, source) => {
+export const buildCppAssetDefinition = (filename, source) => {
   const assetPath = `/${filename.replace(/.gz$/, "")}`
   const baseName = filename
     .replace(/[^a-zA-Z0-9]/g, '_')
@@ -33,7 +31,7 @@ const buildCppAssetDefinition = (filename, source) => {
   }
 }
 
-const buildCppAssetIndex = (definitions) => {
+export const buildCppAssetIndex = (definitions) => {
   const contentTypesByExtension = {
     html: "text/html",
     js: "text/javascript",
@@ -82,7 +80,7 @@ class GenerateCppAssetIndex {
   apply(compiler) {
     compiler.hooks.emit.tap(PLUGIN_NAME, compilation => {
       const assetDefns = Object.entries(compilation.assets)
-        .filter(([filename]) => filename.endsWith(".gz"))
+        .filter(([filename]) => filename.endsWith(".gz") || filename === "index.html")
         .map(([filename, {_value: source}]) => buildCppAssetDefinition(filename, source))
 
       compilation.assets['web_assets.h'] = buildCppAssetIndex(assetDefns)
@@ -90,4 +88,3 @@ class GenerateCppAssetIndex {
   }
 }
 
-module.exports = GenerateCppAssetIndex;

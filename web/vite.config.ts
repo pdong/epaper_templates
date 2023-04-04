@@ -1,9 +1,14 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import viteCompression from 'vite-plugin-compression';
+import viteAssets from './util/vite-asset-plugin';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  build: {
+    outDir: 'build'
+  },
+  plugins: [react(), viteCompression(), viteAssets()],
   resolve: {
     alias: [
       {
