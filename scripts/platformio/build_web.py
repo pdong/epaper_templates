@@ -21,19 +21,16 @@ def build_web():
         print("Attempting to build webpage...")
         try:
             if platform.system() == "Windows":
-                print(check_output(["npm.cmd", "install", "--only=dev"]))
+                print(check_output(["npm.cmd", "install"]))
                 print(check_output(["npm.cmd", "run", "build"]))
             else:
                 print(check_output(["npm", "install"]))
                 print(check_output(["npm", "run", "build"]))
 
-            if not os.path.exists("../dist"):
-                os.mkdir("../dist")
-
-            copyfile("build/web_assets.h", "../dist/web_assets.h")
+            copyfile("dist/web_assets.h", "../dist/web_assets.h")
                 
         except BaseException as e:
-            raise BaseException("Error building web assets: " + e)
+            raise BaseException("Error building web assets: " + str(e))
         finally:
             os.chdir("..")
     else:

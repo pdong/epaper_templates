@@ -1,5 +1,6 @@
 export const buildCppAssetDefinition = (filename, source) => {
-  const assetPath = `/${filename.replace(/.gz$/, "")}`
+  console.log('buildCppAssetDefinition', filename);
+  const assetPath = filename.replace(/.gz$/, "");
   const baseName = filename
     .replace(/[^a-zA-Z0-9]/g, '_')
     .toUpperCase()
