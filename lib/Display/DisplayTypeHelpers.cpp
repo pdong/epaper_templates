@@ -34,6 +34,7 @@ const std::map<const char*, GxEPD2::Panel, cmp_str> DisplayTypeHelpers::PANELS_B
   { "GDEW0371W7", GxEPD2::Panel::GDEW0371W7 },
   { "GDEW042T2", GxEPD2::Panel::GDEW042T2 },
   { "GDEW042Z15", GxEPD2::Panel::GDEW042Z15 },
+  { "GDEQ042Z21", GxEPD2::Panel::GDEQ042Z21 },
   { "GDEW0583T7", GxEPD2::Panel::GDEW0583T7 },
   { "GDEW0583Z21", GxEPD2::Panel::GDEW0583Z21 },
   { "ED060SCT", GxEPD2::Panel::ED060SCT },
@@ -60,6 +61,7 @@ const std::map<const GxEPD2::Panel, const char*> DisplayTypeHelpers::PANEL_DESCR
   { GxEPD2::Panel::GDEW0371W7, "3.7\" B/W" },
   { GxEPD2::Panel::GDEW042T2, "4.2\" B/W" },
   { GxEPD2::Panel::GDEW042Z15, "4.2\" B/W/R" },
+  { GxEPD2::Panel::GDEQ042Z21, "4.2\" B/W/R" },
   { GxEPD2::Panel::GDEW0583T7, "5.83\" B/W" },
   { GxEPD2::Panel::GDEW0583Z21, "5.83\" B/W/R" },
   { GxEPD2::Panel::ED060SCT, "6\" B/W" },
@@ -86,6 +88,7 @@ const std::map<const GxEPD2::Panel, const char*> DisplayTypeHelpers::PANEL_COLOR
   { GxEPD2::Panel::GDEW0371W7, "BW"},
   { GxEPD2::Panel::GDEW042T2, "BW"},
   { GxEPD2::Panel::GDEW042Z15, "BWR"},
+  { GxEPD2::Panel::GDEQ042Z21, "BWR"},
   { GxEPD2::Panel::GDEW0583T7, "BW"},
   { GxEPD2::Panel::GDEW0583Z21, "BWR"},
   { GxEPD2::Panel::ED060SCT, "BW"},
@@ -116,7 +119,8 @@ const std::map<const GxEPD2::Panel, std::pair<uint16_t, uint16_t>> DisplayTypeHe
   { GxEPD2::Panel::GDEW0213Z16, std::make_pair<uint16_t, uint16_t>(104,212) },
   { GxEPD2::Panel::GDEW027C44, std::make_pair<uint16_t, uint16_t>(176,264) },
   { GxEPD2::Panel::GDEW029Z10, std::make_pair<uint16_t, uint16_t>(128,296) },
-  { GxEPD2::Panel::GDEW042Z15, std::make_pair<uint16_t, uint16_t>(400,300) },
+    { GxEPD2::Panel::GDEW042Z15, std::make_pair<uint16_t, uint16_t>(400,300) },
+  { GxEPD2::Panel::GDEQ042Z21, std::make_pair<uint16_t, uint16_t>(400,300) },
   { GxEPD2::Panel::GDEW0583Z21, std::make_pair<uint16_t, uint16_t>(600,448) },
   { GxEPD2::Panel::GDEW075Z09, std::make_pair<uint16_t, uint16_t>(640,384) },
   { GxEPD2::Panel::GDEW075Z08, std::make_pair<uint16_t, uint16_t>(800,480) },
@@ -153,6 +157,7 @@ bool DisplayTypeHelpers::is3Color(GxEPD2::Panel type) {
     case GxEPD2::Panel::GDEW029Z10:
     case GxEPD2::Panel::GDEW027C44:
     case GxEPD2::Panel::GDEW042Z15:
+    case GxEPD2::Panel::GDEQ042Z21:
     case GxEPD2::Panel::GDEW0583Z21:
     case GxEPD2::Panel::GDEW075Z09:
     case GxEPD2::Panel::GDEW075Z08:
@@ -206,6 +211,8 @@ GxEPD2_GFX* DisplayTypeHelpers::buildDisplay(GxEPD2::Panel type, uint8_t dc, uin
     case GxEPD2::Panel::GDEW027C44:
       return __gxepd2_build_3c_driver<GxEPD2_270c>(dc, rst, busy, ss);
     case GxEPD2::Panel::GDEW042Z15:
+      return __gxepd2_build_3c_driver<GxEPD2_420c>(dc, rst, busy, ss);
+    case GxEPD2::Panel::GDEQ042Z21:
       return __gxepd2_build_3c_driver<GxEPD2_420c>(dc, rst, busy, ss);
     case GxEPD2::Panel::GDEW0583Z21:
       return __gxepd2_build_3c_driver<GxEPD2_583c>(dc, rst, busy, ss);

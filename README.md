@@ -92,7 +92,7 @@ In the **Hardware** tab of the settings page, you can select one of the two free
 
 |           | VSPI | HSPI (default) | Waveshare Custom |
 |-----------|------|----------------|-|
-| DI (MOSI) | 19   | 12             |14|
+| DI (MOSI) | 19   | 13             |14|
 | CLK       | 18   | 14             |13|
 | CS (SS)   | 5    | 15             |15|
 

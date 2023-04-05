@@ -66,7 +66,7 @@ export default function (options: ViteAssetPlugin = {}): Plugin {
                 let files = readAllFile(outputPath) || []
     
                 const assetDefns = files
-                    .filter(filename => filename.endsWith(".gz") || filename.endsWith("index.html"))
+                    .filter(filename => filename.endsWith(".gz"))
                     .map(async (filePath: string) => {
                         let source = await fs.readFileSync(filePath);
                         const buildFilepath = filePath.replace(/\\/g, "/").split(`${config.build.outDir}/`)[1];
@@ -75,7 +75,7 @@ export default function (options: ViteAssetPlugin = {}): Plugin {
                 Promise.all(assetDefns).then(async values => {
                     const cppAssetIndex = buildCppAssetIndex(values);
     
-                    await fs.writeFile(`${config.build.outDir}/web_assets.h`, cppAssetIndex.source())
+                    await fs.writeFile(`${config.build.outDir}/web_assets.h`, cppAssetIndex)
                 })
             
             }
