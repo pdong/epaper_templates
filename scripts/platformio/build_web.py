@@ -27,6 +27,9 @@ def build_web():
                 print(check_output(["npm", "install"]))
                 print(check_output(["npm", "run", "build"]))
 
+            if not os.path.exists("../dist"):
+                os.mkdir("../dist")
+
             copyfile("dist/web_assets.h", "../dist/web_assets.h")
                 
         except BaseException as e:
