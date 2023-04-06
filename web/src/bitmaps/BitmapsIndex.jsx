@@ -1,5 +1,4 @@
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, {
   useCallback,
   useEffect,
@@ -13,6 +12,7 @@ import {
   Routes,
   useNavigate,
   useParams,
+  useSearchParams,
   useLocation,
   matchRoutes,
 } from "react-router-dom";
@@ -90,6 +90,7 @@ const ShowBitmapEditor = ({ reload, doneLoading, bitmapData, bitmapList }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [{ route }] = matchRoutes([{ path: "/bitmaps/:filename" }], location);
+  const [currentQueryParameters, setSearchParams] = useSearchParams();
   const { filename } = useParams();
   const isNew = filename === "_new";
 
@@ -98,7 +99,7 @@ const ShowBitmapEditor = ({ reload, doneLoading, bitmapData, bitmapList }) => {
   const [initializing, setInitializing] = useState(true);
 
   useEffect(() => {
-    if (isNew) return;
+    if (isNew) setInitializing(false);
     const bt = bitmapList && bitmapList.find((x) => x.filename == filename);
     setBitmapDefinition(bt);
 
@@ -116,14 +117,12 @@ const ShowBitmapEditor = ({ reload, doneLoading, bitmapData, bitmapList }) => {
     if (filename) {
       const width = parseInt(params.get("w"));
       const height = parseInt(params.get("h"));
-      console.log("user effect", filename, width, height);
       const bitmap = {
         filename,
         metadata: { width, height },
         name: `/b/${filename}`,
       };
       _setBitmapData(new Uint8Array((width * height) / 8));
-      console.log(bitmap);
       setBitmapDefinition(bitmap);
     }
   }, [location]);
@@ -166,14 +165,17 @@ const ShowBitmapEditor = ({ reload, doneLoading, bitmapData, bitmapList }) => {
   }, [history, bitmapDefinition, reload]);
 
   const onNewBitmap = useCallback(({ filename, width, height }) => {
-    navigate(`${route.url}?filename=${filename}&w=${width}&h=${height}`);
+    setSearchParams({ filename, w: width, h: height });
   }, []);
 
   if (bitmapDefinition == null) {
     if (!doneLoading || initializing) {
-      return <SiteLoader />;
+      return (
+        <div>
+          {JSON.stringify(doneLoading)}, {JSON.stringify(initializing)}
+        </div>
+      );
     } else if (isNew) {
-      console.log("new", bitmapDefinition);
       return <NewBitmapConfigurator onSave={onNewBitmap} />;
     } else {
       return <h3 className="text-center pt-5">Bitmap not found</h3>;
