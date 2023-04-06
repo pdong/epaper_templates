@@ -23,7 +23,7 @@ export default ({ onSave }) => {
   const [errors, setErrors] = useState({});
 
   const _onSave = useCallback(
-    e => {
+    (e) => {
       e.preventDefault();
       const newErrors = {};
 
@@ -59,7 +59,7 @@ export default ({ onSave }) => {
           <LabelWithError label="Name" error={errors.filename} />
           <Form.Control
             value={filename}
-            onChange={e => setFilename(e.target.value)}
+            onChange={(e) => setFilename(e.target.value)}
             placeholder="my-cool-bitmap.bin"
           />
         </Form.Group>
@@ -69,24 +69,20 @@ export default ({ onSave }) => {
 
           <div className="dimensions-inputs d-flex">
             <InputGroup>
-              <InputGroup.Prepend>
-                <InputGroup.Text>Width</InputGroup.Text>
-              </InputGroup.Prepend>
+              <InputGroup.Text>Width</InputGroup.Text>
               <Form.Control
                 type="number"
                 value={width}
-                onChange={e => setWidth(e.target.value)}
+                onChange={(e) => setWidth(e.target.value)}
               />
             </InputGroup>
 
             <InputGroup>
-              <InputGroup.Prepend>
-                <InputGroup.Text>Height</InputGroup.Text>
-              </InputGroup.Prepend>
+              <InputGroup.Text>Height</InputGroup.Text>
               <Form.Control
                 type="number"
                 value={height}
-                onChange={e => setHeight(e.target.value)}
+                onChange={(e) => setHeight(e.target.value)}
               />
             </InputGroup>
           </div>
@@ -96,7 +92,10 @@ export default ({ onSave }) => {
           <div className="d-flex mt-4">
             <div className="mr-auto" />
             <Button type="submit" variant="primary">
-              <MemoizedFontAwesomeIcon icon={faPlusCircle} className="fa-fw mr-1" />
+              <MemoizedFontAwesomeIcon
+                icon={faPlusCircle}
+                className="fa-fw mr-1"
+              />
               Create Bitmap
             </Button>
           </div>

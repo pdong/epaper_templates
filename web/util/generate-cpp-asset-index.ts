@@ -1,14 +1,25 @@
-const PLUGIN_NAME = "GenerateCpAssetIndex"
+type CppAssetDefinition = {
+  progmemSourceVar: string;
+  progmemDefinition: string;
+  pathVar: string;
+  pathDefinition: string;
+  length: number;
+  lengthVar: string;
+  lengthDefinition: string;
+  source: Buffer;
+  assetPath: string;
+  extension: Array<string>;
+}
 
-const buildCppAssetDefinition = (filename, source) => {
-  const assetPath = `/${filename.replace(/.gz$/, "")}`
+export const buildCppAssetDefinition = (filename: string, source: Buffer): CppAssetDefinition => {
+  const assetPath = filename.replace(/.gz$/, "");
   const baseName = filename
     .replace(/[^a-zA-Z0-9]/g, '_')
     .toUpperCase()
   const sourceBytes = new Int16Array(source)
 
   const pathVar = `${baseName}_PATH`
-  const pathDefinition = `static const char ${pathVar}[] = "${assetPath}";`
+  const pathDefinition = `static const char ${pathVar}[] = "/${assetPath}";`
 
   const progmemSourceVar = baseName
   const progmemDefinition = `static const uint8_t ${progmemSourceVar}[] PROGMEM = { ${sourceBytes.join(",")} };`
@@ -19,22 +30,19 @@ const buildCppAssetDefinition = (filename, source) => {
   return {
     progmemSourceVar,
     progmemDefinition,
-
     pathVar,
     pathDefinition,
-
     length: source.length,
     lengthVar,
     lengthDefinition,
-
     source,
     assetPath,
     extension: assetPath.split('.').slice(-1)
   }
 }
 
-const buildCppAssetIndex = (definitions) => {
-  const contentTypesByExtension = {
+export const buildCppAssetIndex = (definitions: Array<CppAssetDefinition>) => {
+  const contentTypesByExtension: {[extension: string]: string } = {
     html: "text/html",
     js: "text/javascript",
     css: "text/css"
@@ -56,7 +64,7 @@ ${definitions.map(x => x.progmemDefinition).join("\n")}
 ${definitions.map(x => x.lengthDefinition).join("\n")}
 static const std::map<const char*, const char*, cmp_str> WEB_ASSET_CONTENT_TYPES = {\n${
   definitions
-    .map(x => `{${x.pathVar},"${contentTypesByExtension[x.extension]}"}`)
+    .map(definition => `{${definition.pathVar},"${contentTypesByExtension[definition.extension[0]]}"}`)
     .join(",\n")
 }\n};
 static const std::map<const char*, size_t, cmp_str> WEB_ASSET_LENGTHS = {\n${
@@ -70,24 +78,7 @@ static const std::map<const char*, const uint8_t*> WEB_ASSET_CONTENTS = {\n${
     .join(",\n")
 }\n};
 `
-  return {
-    source: () => source,
-    size: () => source.length
-  }
+  return source;
 }
 
-class GenerateCppAssetIndex {
-  constructor() { }
 
-  apply(compiler) {
-    compiler.hooks.emit.tap(PLUGIN_NAME, compilation => {
-      const assetDefns = Object.entries(compilation.assets)
-        .filter(([filename]) => filename.endsWith(".gz"))
-        .map(([filename, {_value: source}]) => buildCppAssetDefinition(filename, source))
-
-      compilation.assets['web_assets.h'] = buildCppAssetIndex(assetDefns)
-    })
-  }
-}
-
-module.exports = GenerateCppAssetIndex;

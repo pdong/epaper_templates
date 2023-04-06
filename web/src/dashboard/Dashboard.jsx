@@ -8,9 +8,7 @@ import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import Alert from "react-bootstrap/Alert";
 import Form from "react-bootstrap/Form";
-
 import "./Dashboard.scss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPowerOff,
   faRedoAlt,
@@ -19,10 +17,15 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useInterval, useBoolean } from "react-use";
 import MemoizedFontAwesomeIcon from "../util/MemoizedFontAwesomeIcon";
-import { useMemo } from "react";
 import useGlobalState from "../state/global_state";
+import { Link } from "react-router-dom";
 
 const DisplayStatusCard = ({ settings }) => {
+  const currentTemplatePath = settings?.["display.template_name"] || "";
+  const nameFromPath = /\/t\/(.*)\.json/;
+  const currentTemplateName = nameFromPath.exec(currentTemplatePath)?.[1];
+  const displayName = settings?.["display.display_type"] || "-";
+
   return (
     <Card>
       <Card.Header as="h5">Display</Card.Header>
@@ -31,10 +34,16 @@ const DisplayStatusCard = ({ settings }) => {
         {settings != null && (
           <>
             <h6>Display Type</h6>
-            <p>{settings["display.display_type"]}</p>
+            <p>{displayName && <Link to="/settings">{displayName}</Link>}</p>
 
             <h6>Current Template</h6>
-            <p>{settings["display.template_name"]}</p>
+            <p>
+              {currentTemplatePath && (
+                <Link to={`/templates/${currentTemplateName}`}>
+                  {currentTemplatePath}
+                </Link>
+              )}
+            </p>
           </>
         )}
       </Card.Body>

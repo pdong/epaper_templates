@@ -2,13 +2,11 @@ import {
   faCheck,
   faPlus,
   faSave,
-  faTrash
+  faTrash,
 } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import Badge from "react-bootstrap/Badge";
 import api from "../util/api";
 import SiteLoader from "../util/SiteLoader";
 import { useTimeoutFn } from "react-use";
@@ -49,14 +47,14 @@ const VariableEditor = ({
   id,
   onSubmit,
   onDelete,
-  lastUpdated
+  lastUpdated,
 }) => {
   const _onSubmit = useCallback(() => {
     onSubmit(id, { variableKey: variableKey, variableValue: variableValue });
   }, [variableKey, variableValue]);
 
   const _onChangeKey = useCallback(
-    e => {
+    (e) => {
       const value = e.target.value;
       onChange(id, { variableKey: value });
     },
@@ -64,7 +62,7 @@ const VariableEditor = ({
   );
 
   const _onChangeValue = useCallback(
-    e => {
+    (e) => {
       const value = e.target.value;
       onChange(id, { variableValue: value });
     },
@@ -72,7 +70,7 @@ const VariableEditor = ({
   );
 
   const _onBlur = useCallback(
-    e => {
+    (e) => {
       if (!isNew) {
         _onSubmit();
       }
@@ -81,7 +79,7 @@ const VariableEditor = ({
   );
 
   const _onKeyPress = useCallback(
-    e => {
+    (e) => {
       if (e.key == "Enter") {
         _onBlur();
       }
@@ -113,7 +111,7 @@ const VariableEditor = ({
         value={variableValue}
         onChange={_onChangeValue}
         onBlur={_onBlur}
-        onKeyPress={_onKeyPress}
+        onKeyDown={_onKeyPress}
       />
 
       <div className="flex-grow-1 button-container">
@@ -140,17 +138,17 @@ const VariablesEditor = ({
   onAdd,
   onDelete,
   onSubmit,
-  variables
+  variables,
 }) => {
   return (
     <div className="variables-form">
-      {variables.map(x => (
+      {variables.map((x) => (
         <VariableEditor
           key={x.id}
           {...x}
           onSubmit={onSubmit}
           onChange={onChange}
-          onDelete={e => onDelete(x.id)}
+          onDelete={(e) => onDelete(x.id)}
         />
       ))}
       <Button variant="success" onClick={onAdd}>
@@ -161,7 +159,7 @@ const VariablesEditor = ({
   );
 };
 
-export default props => {
+export default (props) => {
   const [variables, setVariables] = useState(null);
   const [globalState, globalActions] = useGlobalState();
   const onChangeRef = useRef(null);
@@ -169,24 +167,25 @@ export default props => {
   useEffect(() => {
     const fields = {};
 
-    Object.entries(globalState.variables).forEach(([variableKey, variableValue], id) => {
-      fields[id] = {
-        variableKey,
-        variableValue,
-        isNew: false,
-        id
-      };
-    });
+    Object.entries(globalState.variables).forEach(
+      ([variableKey, variableValue], id) => {
+        fields[id] = {
+          variableKey,
+          variableValue,
+          isNew: false,
+          id,
+        };
+      }
+    );
 
     setVariables(fields);
   }, [globalState.variables]);
-
 
   const onChange = useCallback(
     (id, fields) => {
       setVariables({
         ...variables,
-        [id]: { ...variables[id], ...fields }
+        [id]: { ...variables[id], ...fields },
       });
     },
     [variables]
@@ -196,12 +195,12 @@ export default props => {
     const id = Object.keys(variables).length;
     setVariables({
       ...variables,
-      [id]: { variableKey: "", variableValue: "", isNew: true, id }
+      [id]: { variableKey: "", variableValue: "", isNew: true, id },
     });
   }, [variables]);
 
   const onDelete = useCallback(
-    id => {
+    (id) => {
       const variable = variables[id];
       const copy = { ...variables };
       delete copy[id];
@@ -228,7 +227,7 @@ export default props => {
       }
       if (
         Object.values(variables).filter(
-          x => x.variableKey == fields.variableKey
+          (x) => x.variableKey == fields.variableKey
         ).length > 1
       ) {
         errors.variableKey = "This variable already exists";
@@ -239,12 +238,12 @@ export default props => {
       if (!hasErrors) {
         api
           .put("/variables", { [fields.variableKey]: fields.variableValue })
-          .then(e => {
+          .then((e) => {
             onChangeRef.current(id, {
               ...fields,
               errors,
               isNew: hasErrors,
-              lastUpdated: new Date()
+              lastUpdated: new Date(),
             });
           });
       }

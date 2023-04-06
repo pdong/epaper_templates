@@ -1,11 +1,11 @@
 import React from "react";
-import Loader from "react-loader-spinner";
+import { Radio } from "react-loader-spinner";
 
 import "./SiteLoader.scss";
 
 export default ({ size = "lg" }) => (
   <div className="text-primary">
-    <Loader
+    <Radio
       width={size == "lg" ? 80 : 20}
       height={size == "lg" ? 80 : 20}
       type="Grid"

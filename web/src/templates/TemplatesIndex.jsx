@@ -1,15 +1,13 @@
 import {
   faPlus,
   faTv,
-  faBackward,
-  faLongArrowAltLeft
+  faLongArrowAltLeft,
 } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Col from "react-bootstrap/Col";
 import Nav from "react-bootstrap/Nav";
 import Row from "react-bootstrap/Row";
-import { Link, NavLink, useRouteMatch } from "react-router-dom";
+import { Link, NavLink, useMatch } from "react-router-dom";
 import api from "../util/api";
 import SiteLoader from "../util/SiteLoader";
 import TemplateEditor from "./TemplateEditor";
@@ -20,13 +18,13 @@ const TemplatesList = ({
   templates,
   activeTemplate,
   onSelect,
-  selectedValue
+  selectedValue,
 }) => {
   return (
     <Nav activeKey={selectedValue} variant="pills" className="flex-column">
       {templates
         .sort((x, y) => x.name.localeCompare(y.name))
-        .map(x => {
+        .map((x) => {
           const displayName = x.name
             .split("/")
             .slice(-1)[0]
@@ -36,10 +34,10 @@ const TemplatesList = ({
             <Nav.Item key={x.name}>
               <NavLink
                 className="nav-link d-flex"
-                to={`/templates/${displayName}.json`}
+                to={`/templates/${displayName}`}
               >
                 <span className="flex-grow-1">{displayName}</span>
-                {activeTemplate == x.name && (
+                {activeTemplate === x.name && (
                   <MemoizedFontAwesomeIcon className="fa-sm mt-1" icon={faTv} />
                 )}
               </NavLink>
@@ -52,16 +50,16 @@ const TemplatesList = ({
       <Nav.Item key="new">
         <NavLink to="/templates/new" className="nav-link bg-success">
           <MemoizedFontAwesomeIcon className="fa-fw mr-1" icon={faPlus} />
-          New
+          Add New Template
         </NavLink>
       </Nav.Item>
     </Nav>
   );
 };
 
-export default props => {
+export default (props) => {
   const { params: { template_name: templateName } = {} } =
-    useRouteMatch("/templates/:template_name") || {};
+    useMatch("/templates/:template_name") || {};
   const isNew = templateName === "new";
   const isIndex = !isNew && !templateName;
 
@@ -73,8 +71,9 @@ export default props => {
   const [activeTemplate, setActiveTemplate] = useState(null);
 
   const triggerReload = useCallback(() => {
-    api.get("/templates").then(x => setTemplates(x.data.templates));
-    globalActions.loadSettings({forceReload: true}).then(settings => {
+    api.get("/templates").then((x) => setTemplates(x.data.templates));
+    globalActions.loadSettings({ forceReload: true }).then((settings) => {
+      console.log("settings", settings);
       setActiveTemplate(settings["display.template_name"]);
     });
   }, [setActiveTemplate, templates, setTemplates]);
@@ -92,17 +91,21 @@ export default props => {
   useEffect(() => {
     if (templateName && templateName !== "new") {
       api
-        .get(`/templates/${templateName}`)
-        .then(x =>
+        .get(`/templates/${templateName}.json`)
+        .then((x) =>
           setTemplateContents({ ...templateContents, [templateName]: x.data })
         );
     }
   }, [templateName]);
 
+  const nameFromPath = /\/t\/(.*)\.json/;
+
   const isSelectedTemplateActive =
     templateName &&
     activeTemplate &&
-    templateName === activeTemplate.split("/")[2];
+    templateName === activeTemplate?.match(nameFromPath)?.[1];
+
+  console.log(templateName, activeTemplate, activeTemplate?.split("/"));
 
   return (
     <>

@@ -8,9 +8,9 @@ import {
   faSave,
   faTv,
   faTrash,
-  faExclamationTriangle
+  faExclamationTriangle,
 } from "@fortawesome/free-solid-svg-icons";
-import { Prompt, useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import "./TemplateEditor.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -44,14 +44,14 @@ const RawJsonEditor = ({ value, onChange, setSubNav, isHidden }) => {
   }, [value, setInternalValue]);
 
   const _onChange = useCallback(
-    e => {
+    (e) => {
       setInternalValue(e.target.value);
     },
     [setInternalValue]
   );
 
   const save = useCallback(
-    e => {
+    (e) => {
       try {
         onChange(JSON.parse(internalValue));
         setError(null);
@@ -81,11 +81,11 @@ const isHiddenEqual = (n, p) => {
   return n === p || (n.isHidden && p.isHidden);
 };
 
-const editorMemoize = c => React.memo(c, isHiddenEqual);
+const editorMemoize = (c) => React.memo(c, isHiddenEqual);
 
 const EditorModeHandlers = {
   json: editorMemoize(RawJsonEditor),
-  visual: editorMemoize(VisualTemplateEditor)
+  visual: editorMemoize(VisualTemplateEditor),
 };
 
 const SwitchableJsonEditor = ({ value, onChange, ...rest }) => {
@@ -95,7 +95,7 @@ const SwitchableJsonEditor = ({ value, onChange, ...rest }) => {
   const ViewComponent = EditorModeHandlers[mode];
 
   const updateSubNav = useCallback(
-    items => {
+    (items) => {
       if (subNavMode == null && items.length > 0) {
         setSubNavMode(items.length > 0 ? items[0].key : null);
       }
@@ -172,20 +172,20 @@ export default ({ isActive, path, template, triggerReload }) => {
       markForCollapse,
       markSaved,
       isSaved,
-      collapse
-    }
+      collapse,
+    },
   ] = useUndoableMap();
   const [name, setName] = useState(null);
   const [globalState, globalActions] = useGlobalState();
   const [activeWarningHidden, toggleActiveWarningHidden] = useBoolean(false);
   const isNew = path === "new";
-  const history = useHistory();
+  const navigate = useNavigate();
   const location = useLocation();
   const currentJson = useRef(null);
 
   useEffect(() => {
     currentJson.current = json;
-  }, [json])
+  }, [json]);
 
   useEffect(() => {
     if (template) {
@@ -205,39 +205,40 @@ export default ({ isActive, path, template, triggerReload }) => {
   }, [setName, path]);
 
   const onChangeName = useCallback(
-    e => {
+    (e) => {
       setName(e.target.value);
     },
     [setName]
   );
 
   const onActivate = useCallback(
-    e => {
+    (e) => {
       api
-        .put("/settings", { "display.template_name": `/t/${name}` })
+        .put("/settings", { "display.template_name": `/t/${name}.json` })
         .then(triggerReload);
     },
     [name, triggerReload]
   );
 
   const onSubmit = useCallback(
-    e => {
+    (e) => {
       e.preventDefault();
 
+      console.log("submit", name);
       const filename = name.endsWith(".json") ? name : `${name}.json`;
 
       // Filter out items that were marked for deletion
-      const updated = produce(currentJson.current, draft => {
+      const updated = produce(currentJson.current, (draft) => {
         ["formatters", ...Object.keys(FieldTypeDefinitions)].forEach(
-          fieldType => {
+          (fieldType) => {
             if (draft[fieldType]) {
               draft[fieldType] = draft[fieldType].filter(
-                x => x !== MarkedForDeletion
+                (x) => x !== MarkedForDeletion
               );
-              draft[fieldType].forEach(x => {
+              draft[fieldType].forEach((x) => {
                 Object.keys(x)
-                  .filter(k => k.startsWith("__"))
-                  .forEach(k => delete x[k]);
+                  .filter((k) => k.startsWith("__"))
+                  .forEach((k) => delete x[k]);
               });
             }
           }
@@ -254,14 +255,10 @@ export default ({ isActive, path, template, triggerReload }) => {
           markSaved();
           onActivate();
 
-          if (!location.pathname.endsWith(filename)) {
-            history.push(`/templates/${filename}`);
-          }
-
           setJson(updated);
           markSaved();
         },
-        e => {
+        (e) => {
           globalActions.addError("Error saving: " + e);
         }
       );
@@ -270,11 +267,11 @@ export default ({ isActive, path, template, triggerReload }) => {
   );
 
   const onDelete = useCallback(
-    e => {
+    (e) => {
       if (confirm("Are you sure you want to delete this template?")) {
-        api.delete(`/templates/${path}`).then(() => {
+        api.delete(`/templates/${path}.json`).then(() => {
           triggerReload();
-          history.push("/templates");
+          navigate("/templates");
         });
       }
     },
@@ -283,12 +280,12 @@ export default ({ isActive, path, template, triggerReload }) => {
 
   return (
     <>
-      <Prompt
+      {/* <Prompt
         when={!isSaved}
         message={
           "You have unsaved changes.  Are you sure you want to leave this page?"
         }
-      />
+      /> */}
       <Form onSubmit={onSubmit}>
         {(json == null || name == null) && <SiteLoader />}
         {json != null && name != null && (
@@ -296,7 +293,7 @@ export default ({ isActive, path, template, triggerReload }) => {
             {!isNew && !isActive && !activeWarningHidden && (
               <Alert
                 dismissible
-                onClose={e => toggleActiveWarningHidden()}
+                onClose={(e) => toggleActiveWarningHidden()}
                 variant="secondary"
               >
                 <h5 className="text-warning">

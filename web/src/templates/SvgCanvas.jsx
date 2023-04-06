@@ -3,18 +3,17 @@ import React, {
   useEffect,
   useMemo,
   useState,
-  useRef
+  useRef,
 } from "react";
 import { binToDataUrl } from "../bitmaps/BitmapCanvas";
 import useGlobalState from "../state/global_state";
 import "./SvgCanvas.scss";
 import {
   FieldTypeDefinitions,
-  FontDefinitions,
   getFontDefinition,
   MarkedForDeletion,
   createDefaultElement,
-  updateDefaultElement
+  updateDefaultElement,
 } from "./schema";
 import { original } from "immer";
 
@@ -38,12 +37,12 @@ const SvgLine = React.memo(
       definition: { x1 = 0, y1 = 0, x2 = 0, y2 = 0, color = "black" },
       isActive,
       onClick,
-      className
+      className,
     } = props;
 
     const style = useMemo(
       () => ({
-        stroke: color
+        stroke: color,
       }),
       [color]
     );
@@ -51,7 +50,6 @@ const SvgLine = React.memo(
     return (
       <line
         ref={ref}
-        className={className}
         {...{ x1, y1, x2, y2 }}
         className={className}
         onClick={onClick}
@@ -69,15 +67,16 @@ const SvgText = React.memo(
       onClick,
       isActive,
       resolvedValues,
-      className
+      className,
     } = props;
     const style = useMemo(() => {
       const fontStyle = getFontDefinition(definition.font).style;
       return {
         fill: color,
         ...fontStyle,
-        fontSize: `calc(${fontStyle.fontSize}pt * ${definition.font_size ||
-          1} * 1.4)`
+        fontSize: `calc(${fontStyle.fontSize}pt * ${
+          definition.font_size || 1
+        } * 1.4)`,
       };
     }, [definition, isActive]);
 
@@ -89,7 +88,6 @@ const SvgText = React.memo(
     return (
       <text
         ref={ref}
-        className={className}
         x={x}
         y={y}
         style={style}
@@ -112,16 +110,16 @@ const SvgRectangle = React.memo(
         style,
         color = "black",
         w: widthDef = {},
-        h: heightDef = {}
+        h: heightDef = {},
       },
       onClick,
       isActive,
       resolvedValues,
-      className
+      className,
     } = props;
 
     const [width, height] = useMemo(() => {
-      const extract = key => {
+      const extract = (key) => {
         const def = definition[key];
 
         if (!def) {
@@ -149,7 +147,7 @@ const SvgRectangle = React.memo(
     // The color prop for "filled" rectangles should define the color of the whole rectangle
     // (appropriate prop is "fill").  For outline rectangles, should it's "stroke".
     const colorProps = {
-      [style === "filled" ? "fill" : "stroke"]: color
+      [style === "filled" ? "fill" : "stroke"]: color,
     };
 
     return (
@@ -174,32 +172,32 @@ const SvgBitmap = React.memo(
         h: height = 0,
         color = "black",
         background_color: backgroundColor = "white",
-        value: valueDef
+        value: valueDef,
       },
       static: _static,
       resolvedValues,
       isActive,
       onClick,
-      className
+      className,
     } = props;
     const [globalState, globalActions] = useGlobalState();
     const [src, setSrc] = useState(null);
 
-    const file = useMemo(() => resolveVariableFn(valueDef, resolvedValues), [
-      valueDef,
-      resolvedValues
-    ]);
+    const file = useMemo(
+      () => resolveVariableFn(valueDef, resolvedValues),
+      [valueDef, resolvedValues]
+    );
 
     useEffect(() => {
       if (file) {
-        globalActions.loadBitmap(file).then(x => {
+        globalActions.loadBitmap(file).then((x) => {
           setSrc(
             binToDataUrl({
               binData: x,
               width,
               height,
               color,
-              backgroundColor
+              backgroundColor,
             })
           );
         });
@@ -224,7 +222,7 @@ const SvgElementsByType = {
   lines: SvgLine,
   text: SvgText,
   bitmaps: SvgBitmap,
-  rectangles: SvgRectangle
+  rectangles: SvgRectangle,
 };
 
 const intervalOverlaps = (s1, s2, t1, t2) => {
@@ -240,7 +238,7 @@ const rectOverlaps = (r1, r2) => {
   );
 };
 
-const WrappedSvgElement = React.memo(props => {
+const WrappedSvgElement = React.memo((props) => {
   const {
     toggleActiveElement,
     setActiveElements,
@@ -258,7 +256,7 @@ const WrappedSvgElement = React.memo(props => {
   const [boundingBoxProps, setBoundingBoxProps] = useState(null);
 
   const onClick = useCallback(
-    e => {
+    (e) => {
       if (!rest.definition.__creating) {
         e.stopPropagation();
 
@@ -275,7 +273,7 @@ const WrappedSvgElement = React.memo(props => {
   );
 
   const refCallback = useCallback(
-    e => {
+    (e) => {
       _elementRef.current = e;
       elementRef(type, id, e);
     },
@@ -296,7 +294,7 @@ const WrappedSvgElement = React.memo(props => {
         x: x - outlineOffset,
         y: y - outlineOffset,
         width: width + outlineOffset * 2,
-        height: height + outlineOffset * 2
+        height: height + outlineOffset * 2,
       });
     } else {
       setBoundingBoxProps(null);
@@ -319,7 +317,7 @@ const WrappedSvgElement = React.memo(props => {
         onClick={onClick}
         className={[
           isActive ? "active" : "",
-          isCreating ? "creating" : ""
+          isCreating ? "creating" : "",
         ].join(" ")}
       />
 
@@ -353,13 +351,13 @@ const computeRectFromEndpoints = ({ start, end }) => {
     x: startX,
     y: startY,
     width: endX - startX,
-    height: endY - startY
+    height: endY - startY,
   };
 };
 
 function useForceUpdate() {
   const [, setValue] = useState(0); // integer state
-  return () => setValue(value => ++value); // update the state to force render
+  return () => setValue((value) => ++value); // update the state to force render
 }
 
 export function SvgCanvas({
@@ -375,7 +373,7 @@ export function SvgCanvas({
   collapse,
   setDragging,
   creatingElement,
-  setCreatingElement
+  setCreatingElement,
 }) {
   const isDragging = useRef(null);
   const selectionParams = useRef(null);
@@ -407,14 +405,14 @@ export function SvgCanvas({
 
   const svgStyle = useMemo(
     () => ({
-      backgroundColor: definition.background_color || "white"
+      backgroundColor: definition.background_color || "white",
     }),
     [definition.background_color]
   );
 
   const isRegionActive = useCallback(
     (regionType, index) =>
-      activeElements.some(x => x[0] == regionType && x[1] == index),
+      activeElements.some((x) => x[0] == regionType && x[1] == index),
     [activeElements]
   );
 
@@ -450,7 +448,7 @@ export function SvgCanvas({
       return [x, y];
     };
 
-    const endMouseMove = e => {
+    const endMouseMove = (e) => {
       let acted = false;
 
       if (creatingElement) {
@@ -458,7 +456,7 @@ export function SvgCanvas({
           const coords = extractEventCoordinates(e);
 
           onUpdateActive(
-            defn => {
+            (defn) => {
               delete defn.__creating;
               delete defn.__mousdown;
             },
@@ -470,7 +468,7 @@ export function SvgCanvas({
         }
       } else if (isDragging.current) {
         onUpdateActive(
-          defn => {
+          (defn) => {
             delete defn.__drag;
           },
           { skipHistory: true }
@@ -500,12 +498,12 @@ export function SvgCanvas({
     };
 
     return {
-      onMouseDown: e => {
+      onMouseDown: (e) => {
         if (creatingElement) {
-          const coords = extractEventCoordinates(e, { rounded: true});
+          const coords = extractEventCoordinates(e, { rounded: true });
 
           onUpdateActive(
-            defn => {
+            (defn) => {
               defn.__mousedown = coords;
               Object.assign(
                 defn,
@@ -519,43 +517,43 @@ export function SvgCanvas({
           // tell parent component we're dragging
           setDragging(true);
 
-          onUpdateActive(defn => {
+          onUpdateActive((defn) => {
             const keys = Object.keys(defn);
-            const exFields = prefix =>
-              keys.filter(x => x.startsWith(prefix)).map(x => [x, defn[x]]);
+            const exFields = (prefix) =>
+              keys.filter((x) => x.startsWith(prefix)).map((x) => [x, defn[x]]);
 
             defn.__drag = {
               start: {
                 x: exFields("x"),
-                y: exFields("y")
+                y: exFields("y"),
               },
-              cursor: extractEventCoordinates(e)
+              cursor: extractEventCoordinates(e),
             };
 
             markForCollapse();
           });
         } else if (!isDragging.current && e.target.tagName === "svg") {
           selectionParams.current = {
-            start: extractEventCoordinates(e)
+            start: extractEventCoordinates(e),
           };
           forceUpdate();
         }
       },
-      onClick: e => {
+      onClick: (e) => {
         endMouseMove(e);
       },
-      onMouseEnter: e => {
+      onMouseEnter: (e) => {
         if ((selectionParams.current || isDragging.current) && !e.buttons) {
           endMouseMove(e);
         }
       },
-      onMouseMove: e => {
+      onMouseMove: (e) => {
         if (creatingElement) {
           const coords = extractEventCoordinates(e);
 
-          onUpdateActive(defn => {
-            updateDefaultElement(e, defn, { position: coords })
-          })
+          onUpdateActive((defn) => {
+            updateDefaultElement(e, defn, { position: coords });
+          });
 
           setCursorPosition(coords);
         } else if (isDragging.current) {
@@ -566,7 +564,7 @@ export function SvgCanvas({
 
           const { x, y } = extractEventCoordinates(e);
 
-          onUpdateActive(dfn => {
+          onUpdateActive((dfn) => {
             const ctx = original(dfn.__drag);
 
             if (ctx) {
@@ -584,7 +582,7 @@ export function SvgCanvas({
           selectionParams.current.end = extractEventCoordinates(e);
           forceUpdate();
         }
-      }
+      },
     };
   }, [onUpdateActive, creatingElement]);
 
@@ -596,7 +594,7 @@ export function SvgCanvas({
   //
   useEffect(() => {
     if (selectionBox) {
-      const active = Object.keys(FieldTypeDefinitions).flatMap(type => {
+      const active = Object.keys(FieldTypeDefinitions).flatMap((type) => {
         const refs = elementRefs.current;
         let def = definition[type] || [];
 
@@ -618,7 +616,7 @@ export function SvgCanvas({
               return [type, i];
             }
           })
-          .filter(x => x);
+          .filter((x) => x);
       });
 
       setActiveElements(active);
@@ -635,7 +633,7 @@ export function SvgCanvas({
       className={[
         "template-canvas",
         selectionParams.current ? "selecting" : "",
-        cursorPosition ? "cursor" : ""
+        cursorPosition ? "cursor" : "",
       ].join(" ")}
     >
       <defs>
@@ -644,12 +642,12 @@ export function SvgCanvas({
           dangerouslySetInnerHTML={{
             __html: `
           @import url("https://sidoh.github.io/freefont_web/fonts/stylesheet.css");
-        `
+        `,
           }}
         />
       </defs>
       {Object.keys(FieldTypeDefinitions)
-        .flatMap(type => {
+        .flatMap((type) => {
           let def = definition[type] || [];
 
           if (!Array.isArray(def)) {
@@ -681,7 +679,7 @@ export function SvgCanvas({
             );
           });
         })
-        .filter(x => x)}
+        .filter((x) => x)}
       {selectionParams.current && (
         <rect
           className="selection"

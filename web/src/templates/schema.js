@@ -1,6 +1,3 @@
-import { useMemo } from "react";
-import { original } from "immer";
-
 export const MarkedForDeletion = "__deleted";
 
 const SupportedColors = {
@@ -549,7 +546,7 @@ export const createScreenSettingsSchema = ({ screenMetadata }) => {
       ...Definitions,
       ...createColorDefinition({ colorStr: screenMetadata.colors }),
     },
-    ...ScreenSettings
+    ...ScreenSettings,
   };
 };
 
