@@ -1,11 +1,9 @@
 import {
   faPlus,
   faTv,
-  faBackward,
   faLongArrowAltLeft,
 } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Col from "react-bootstrap/Col";
 import Nav from "react-bootstrap/Nav";
 import Row from "react-bootstrap/Row";
@@ -100,12 +98,14 @@ export default (props) => {
     }
   }, [templateName]);
 
+  const nameFromPath = /\/t\/(.*)\.json/;
+
   const isSelectedTemplateActive =
     templateName &&
     activeTemplate &&
-    templateName === activeTemplate.split("/")[2];
+    templateName === activeTemplate?.match(nameFromPath)?.[1];
 
-  console.log(templateName, activeTemplate);
+  console.log(templateName, activeTemplate, activeTemplate?.split("/"));
 
   return (
     <>
