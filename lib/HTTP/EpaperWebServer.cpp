@@ -135,14 +135,10 @@ void EpaperWebServer::begin() {
           std::bind(&EpaperWebServer::handleFirmwareUpdateUpload, this, _1));
 
   server.onNotFound([this](AsyncWebServerRequest* request) {
-    if (request->url() == "/" || request->url().startsWith("/app")) {
-      _handleServeGzip_P(TEXT_HTML,
+    _handleServeGzip_P(TEXT_HTML,
           INDEX_HTML_GZ,
           INDEX_HTML_GZ_LENGTH,
           request);
-    } else {
-      request->send(404);
-    }
   });
 
   wsServer.onEvent([this](AsyncWebSocket* server,
