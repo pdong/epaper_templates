@@ -73,7 +73,6 @@ export default (props) => {
   const triggerReload = useCallback(() => {
     api.get("/templates").then((x) => setTemplates(x.data.templates));
     globalActions.loadSettings({ forceReload: true }).then((settings) => {
-      console.log("settings", settings);
       setActiveTemplate(settings["display.template_name"]);
     });
   }, [setActiveTemplate, templates, setTemplates]);
@@ -104,8 +103,6 @@ export default (props) => {
     templateName &&
     activeTemplate &&
     templateName === activeTemplate?.match(nameFromPath)?.[1];
-
-  console.log(templateName, activeTemplate, activeTemplate?.split("/"));
 
   return (
     <>
