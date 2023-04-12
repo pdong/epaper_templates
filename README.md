@@ -61,11 +61,11 @@ The [examples directory](./examples) has a few sample templates. Here are a few:
 
 1. Connect display to MCU. See [Hardware Setup](#hardware-setup) below for more information.
 1. Flash your MCU.
-   1. Use a pre-compiled binary from the [releases page](https://github.com/sidoh/epaper_templates/releases). **Make sure to select the file starting with `INITIALIZER_`**. You can use [esptool](https://github.com/espressif/esptool) or the [ESP32 flash tool](https://www.espressif.com/en/support/download/other-tools). Example command:
+   1. Use a pre-compiled binary from the [releases page](https://github.com/sidoh/epaper_templates/releases). **Make sure to select the file ending with `-full.bin`**. You can use [esptool](https://github.com/espressif/esptool) or the [ESP32 flash tool](https://www.espressif.com/en/support/download/other-tools). Example command:
       ```
-      esptool.py --chip esp32 --baud 460800 write_flash 0x1000 INITIALIZER_epaper_templates_esp32-v2.3.0.bin
+      esptool.py --chip esp32 --baud 460800 write_flash 0x1000 firmware-full.bin
       ```
-   2. With PlatformIO: for example `pio run -e esp32 -t upload`. You will need to have [nodejs](https://nodejs.org/en/) installed in order to buidl the web assets.
+   2. With PlatformIO: for example `pio run -e esp32 -t upload`. You will need to have [nodejs](https://nodejs.org/en/) installed in order to build the web assets.
 1. Setup WiFi. A setup AP will appear named `epaper_XXXXXX`. The default password is **waveshare**.
 1. Visit the Web UI to configure further. If you used custom pins, make sure to configure those.
 
@@ -90,11 +90,11 @@ The ESP32 has two available SPI busses. The default is HSPI, but you can select 
 
 In the **Hardware** tab of the settings page, you can select one of the two free SPI busses on the ESP32. (HSPI and VSPI)
 
-|           | VSPI | HSPI (default) | Waveshare Custom |
-| --------- | ---- | -------------- | ---------------- |
-| DI (MOSI) | 19   | 13             | 14               |
-| CLK       | 18   | 14             | 13               |
-| CS (SS)   | 5    | 15             | 15               |
+|            | VSPI | HSPI (default) | Waveshare Custom |
+| ---------- | ---- | -------------- | ---------------- |
+| DIN (MOSI) | 23   | 13             | 14               |
+| CLK        | 18   | 14             | 13               |
+| CS (SS)    | 5    | 15             | 15               |
 
 Ensure that you do not select pins that conflict with the your SPI Bus/Deep Sleep configurations.
 
@@ -108,6 +108,11 @@ e-paper templates can function in _deep sleep_ mode. When configured, the system
 4. Put both the ESP32 and the e-paper display into deep sleep mode.
 
 This is useful if trying to conserve power. Deep sleep mode can be configured in the "Power" tab within the web UI.
+
+## Firemware updates
+
+After flashing `firmware-full.bin` with PIO, esptool, etc. it is possible to flash using the web interface. On the dashboard click on "Update firmware" and then "Choose file". You want to use `firmware.bin` files for UI updates.
+The device will automatically reboot after flashing is done but the UI won't reload on its own so you might need to hit refresh in your browser afterwards.
 
 # Concepts
 
