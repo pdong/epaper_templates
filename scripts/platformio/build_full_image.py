@@ -51,7 +51,7 @@ def create_full_bin(source, target, env):
 env.AddPostAction("$BUILD_DIR/${PROGNAME}.bin", create_full_bin)
 
 
-#Enable this online when needed to erasre flash
+#Enable this online when needed to erase flash
 
 # old_uploaderflags = env["UPLOADERFLAGS"]
 # #print("Old uploaderflags: " + str(old_uploaderflags))
