@@ -23,7 +23,7 @@ jobs:
         with:
           python-version: "3.9"
       - name: Install PlatformIO Core
-        run: pip install --upgrade platformio==6.1.6
+        run: pip install --upgrade platformio
 
       - name: Install Node.js
         uses: actions/setup-node@v2
