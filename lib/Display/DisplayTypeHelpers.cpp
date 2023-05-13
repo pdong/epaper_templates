@@ -18,6 +18,8 @@ inline static GxEPD2_GFX* __gxepd2_build_3c_driver(const uint8_t dc, const uint8
 }
 
 const std::map<const char*, GxEPD2::Panel, cmp_str> DisplayTypeHelpers::PANELS_BY_NAME = {
+  { "GDEH0154D67", GxEPD2::Panel::GDEH0154D67 }, //SSD1681
+  { "GDEW0154M09", GxEPD2::Panel::GDEW0154M09 }, //JD79653A
   { "GDEP015OC1", GxEPD2::Panel::GDEP015OC1 },
   { "GDEW0154Z04", GxEPD2::Panel::GDEW0154Z04 },
   { "GDE0213B1", GxEPD2::Panel::GDE0213B1 },
@@ -45,6 +47,8 @@ const std::map<const char*, GxEPD2::Panel, cmp_str> DisplayTypeHelpers::PANELS_B
 };
 
 const std::map<const GxEPD2::Panel, const char*> DisplayTypeHelpers::PANEL_DESCRIPTIONS = {
+  { GxEPD2::Panel::GDEH0154D67 , "1.54\" B/W"},
+  { GxEPD2::Panel::GDEW0154M09 , "1.54\" B/W"},
   { GxEPD2::Panel::GDEP015OC1, "1.54\" B/W" },
   { GxEPD2::Panel::GDEW0154Z04, "1.54\" B/W/R" },
   { GxEPD2::Panel::GDE0213B1, "2.13\" B/W" },
@@ -72,6 +76,8 @@ const std::map<const GxEPD2::Panel, const char*> DisplayTypeHelpers::PANEL_DESCR
 };
 
 const std::map<const GxEPD2::Panel, const char*> DisplayTypeHelpers::PANEL_COLOR_SUPPORT = {
+  { GxEPD2::Panel::GDEH0154D67 , "BW"},
+  { GxEPD2::Panel::GDEW0154M09 , "BW"},
   { GxEPD2::Panel::GDEP015OC1, "BW" },
   { GxEPD2::Panel::GDEW0154Z04, "BWR"},
   { GxEPD2::Panel::GDE0213B1, "BW"},
@@ -101,6 +107,8 @@ const std::map<const GxEPD2::Panel, const char*> DisplayTypeHelpers::PANEL_COLOR
 // Data generated with:
 // ls src/{epd,epd3c}/*.h | xargs -I % bash -c 'grep -Eo "GxEPD2::[^;]+;" % | cut -d":" -f5 | tr -d "\n" && grep -Eo "(WIDTH|HEIGHT)[ ]*=[ ]*\d+" % | grep -Eo "[0-9]+" | tr "\n" "," && echo'
 const std::map<const GxEPD2::Panel, std::pair<uint16_t, uint16_t>> DisplayTypeHelpers::PANEL_SIZES = {
+  { GxEPD2::Panel::GDEH0154D67, std::make_pair<uint16_t, uint16_t>(200,200) },
+  { GxEPD2::Panel::GDEW0154M09, std::make_pair<uint16_t, uint16_t>(200,200) },
   { GxEPD2::Panel::GDEP015OC1, std::make_pair<uint16_t, uint16_t>(200,200) },
   { GxEPD2::Panel::GDE0213B1, std::make_pair<uint16_t, uint16_t>(128,250) },
   { GxEPD2::Panel::GDEH0213B72, std::make_pair<uint16_t, uint16_t>(128,250) },
@@ -172,6 +180,10 @@ GxEPD2_GFX* DisplayTypeHelpers::buildDisplay(GxEPD2::Panel type, uint8_t dc, uin
     // black/white displays
     case GxEPD2::Panel::GDEP015OC1:
       return __gxepd2_build_bw_driver<GxEPD2_154>(dc, rst, busy, ss);
+    case GxEPD2::Panel::GDEH0154D67:
+      return __gxepd2_build_bw_driver<GxEPD2_154_D67>(dc, rst, busy, ss);
+    case GxEPD2::Panel::GDEW0154M09:
+      return __gxepd2_build_bw_driver<GxEPD2_154_M09>(dc, rst, busy, ss);
     case GxEPD2::Panel::GDE0213B1:
       return __gxepd2_build_bw_driver<GxEPD2_213>(dc, rst, busy, ss);
     case GxEPD2::Panel::GDEH0213B72:
